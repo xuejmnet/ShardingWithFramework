@@ -2,12 +2,16 @@ using Furion;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using ShardingCore;
+using ShardingCore.Core.DbContextCreator;
+using ShardingCore.Core.RuntimeContexts;
+using ShardingCore.Core.ShardingConfigurations.ConfigBuilders;
 using TodoApp.Routes;
 
 namespace TodoApp;
 
 public class ShardingCoreComponent:IServiceComponent
 {
+    public static IShardingRuntimeContext ShardingCoreContext { get; set; }
     ILoggerFactory efLogger = LoggerFactory.Create(builder =>
     {
         builder.AddFilter((category, level) => category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information).AddConsole();
@@ -20,12 +24,11 @@ public class ShardingCoreComponent:IServiceComponent
             // 配置默认数据库
             options.AddDb<MyDbContext>(o =>
             {
-                ShardingCoreExtension.UseDefaultSharding<MyDbContext>(App.RootServices,o);
+                o.UseDefaultSharding<MyDbContext>(ShardingCoreContext);
             });
 
         });
-        services.AddShardingConfigure<MyDbContext>()
-            .UseRouteConfig(op =>
+        ShardingCoreContext=new ShardingRuntimeBuilder<MyDbContext>().UseRouteConfig(op =>
             {
                 op.AddShardingTableRoute<TodoItemTableRoute>();
                 op.AddShardingDataSourceRoute<TodoItemDataSourceRoute>();
@@ -52,6 +55,6 @@ public class ShardingCoreComponent:IServiceComponent
                 {
                     b.ReplaceService<IMigrationsSqlGenerator, ShardingMySqlMigrationsSqlGenerator>();
                 });
-            }).AddShardingCore();
+            }).ReplaceService<IDbContextCreator, CustomerDbContextCreator>(ServiceLifetime.Singleton).Build();
     }
 }
