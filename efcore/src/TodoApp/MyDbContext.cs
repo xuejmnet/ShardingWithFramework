@@ -22,7 +22,15 @@ public class MyDbContext:AbstractShardingDbContext,IShardingTableDbContext
             mb.HasKey(o => o.Id);
             mb.Property(o => o.Id).IsRequired().HasMaxLength(50).HasComment("id");
             mb.Property(o => o.Text).IsRequired().HasMaxLength(256).HasComment("事情");
+            mb.Property(o => o.Name).HasMaxLength(256).HasComment("姓名");
             mb.ToTable(nameof(TodoItem));
+        });
+        modelBuilder.Entity<TodoTest>(mb =>
+        {
+            mb.HasKey(o => o.Id);
+            mb.Property(o => o.Id).IsRequired().HasMaxLength(50).HasComment("id");
+            mb.Property(o => o.Test).IsRequired().HasMaxLength(256).HasComment("测试");
+            mb.ToTable(nameof(TodoTest));
         });
     }
 }
