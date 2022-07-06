@@ -72,16 +72,8 @@ namespace TodoApp.EntityFrameworkCore
                 })
                 .UseConfig((sp, op) =>
                 {
-                    op.UseShellDbContextConfigure(builder =>
-                    {
-                        builder.ReplaceService<IMigrationsSqlGenerator, ShardingSqlServerMigrationsSqlGenerator>();
-                        builder.ReplaceService<IMigrator, ShardingMigrator>();
-                    });
-                    op.UseShardingMigrationConfigure(builder =>
-                    {
-                        builder.ReplaceService<IMigrationsSqlGenerator, ShardingSqlServerMigrationsSqlGenerator>();
-                    });
-                    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                  
+                    //var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
                     op.UseShardingQuery((conStr, builder) =>
                     {
                         builder.UseSqlServer(conStr).UseLoggerFactory(efLogger);
@@ -89,6 +81,10 @@ namespace TodoApp.EntityFrameworkCore
                     op.UseShardingTransaction((connection, builder) =>
                     {
                         builder.UseSqlServer(connection).UseLoggerFactory(efLogger);
+                    });
+                    op.UseShardingMigrationConfigure(builder =>
+                    {
+                        builder.ReplaceService<IMigrationsSqlGenerator, ShardingSqlServerMigrationsSqlGenerator>();
                     });
                     op.AddDefaultDataSource("ds0", "Server=.;Database=TodoApp;Trusted_Connection=True");
                     op.AddExtraDataSource(sp =>

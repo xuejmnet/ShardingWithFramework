@@ -52,9 +52,6 @@ namespace TodoApp.Routes
                 case ShardingOperatorEnum.Equal: return tail => tail == t;
                 default:
                 {
-#if DEBUG
-                    Console.WriteLine($"shardingOperator is not equal scan all table tail");
-#endif
                     return tail => true;
                 }
             }
