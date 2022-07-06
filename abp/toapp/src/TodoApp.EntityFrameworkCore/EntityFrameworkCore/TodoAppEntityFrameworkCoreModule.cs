@@ -1,4 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ShardingCore;
+using ShardingCore.EFCores;
+using TodoApp.Routes;
+using Volo.Abp;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -27,6 +36,10 @@ namespace TodoApp.EntityFrameworkCore
         )]
     public class TodoAppEntityFrameworkCoreModule : AbpModule
     {
+        public static readonly ILoggerFactory efLogger = LoggerFactory.Create(builder =>
+        {
+            builder.AddFilter((category, level) => category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information).AddConsole();
+        });
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             TodoAppEfCoreEntityExtensionMappings.Configure();
@@ -46,7 +59,57 @@ namespace TodoApp.EntityFrameworkCore
                 /* The main point to change your DBMS.
                  * See also TodoAppDbContextFactory for EF Core tooling. */
                 options.UseSqlServer();
+                options.Configure<TodoAppDbContext>(innerContext =>
+                {
+                    ShardingCoreExtension.UseDefaultSharding<TodoAppDbContext>(innerContext.ServiceProvider, innerContext.DbContextOptions);
+                });
             });
+            context.Services.AddShardingConfigure<TodoAppDbContext>()
+                .UseRouteConfig(op =>
+                {
+                    op.AddShardingDataSourceRoute<TodoDataSourceRoute>();
+                    op.AddShardingTableRoute<TodoTableRoute>();
+                })
+                .UseConfig((sp, op) =>
+                {
+                    op.UseShellDbContextConfigure(builder =>
+                    {
+                        builder.ReplaceService<IMigrationsSqlGenerator, ShardingSqlServerMigrationsSqlGenerator>();
+                        builder.ReplaceService<IMigrator, ShardingMigrator>();
+                    });
+                    op.UseShardingMigrationConfigure(builder =>
+                    {
+                        builder.ReplaceService<IMigrationsSqlGenerator, ShardingSqlServerMigrationsSqlGenerator>();
+                    });
+                    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                    op.UseShardingQuery((conStr, builder) =>
+                    {
+                        builder.UseSqlServer(conStr).UseLoggerFactory(efLogger);
+                    });
+                    op.UseShardingTransaction((connection, builder) =>
+                    {
+                        builder.UseSqlServer(connection).UseLoggerFactory(efLogger);
+                    });
+                    op.AddDefaultDataSource("ds0", "Server=.;Database=TodoApp;Trusted_Connection=True");
+                    op.AddExtraDataSource(sp =>
+                    {
+                        return new Dictionary<string, string>()
+                        {
+                            { "ds1", "Server=.;Database=TodoApp1;Trusted_Connection=True" },
+                            { "ds2", "Server=.;Database=TodoApp2;Trusted_Connection=True" }
+                        };
+                    });
+                })
+                .AddShardingCore();
+        }
+
+        public override void OnPostApplicationInitialization(ApplicationInitializationContext context)
+        {
+            base.OnPostApplicationInitialization(context);
+            //创建表的定时任务如果有按年月日系统默认路由的需要系统创建的记得开起来
+            context.ServiceProvider.UseAutoShardingCreate();
+            //补偿表 //自动迁移的话不需要
+            //context.ServiceProvider.UseAutoTryCompensateTable();
         }
     }
 }

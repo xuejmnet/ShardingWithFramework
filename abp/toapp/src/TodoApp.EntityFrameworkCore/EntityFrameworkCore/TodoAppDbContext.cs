@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShardingCore.Core.VirtualRoutes.TableRoutes.RouteTails.Abstractions;
+using ShardingCore.Sharding.Abstractions;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -19,9 +21,10 @@ namespace TodoApp.EntityFrameworkCore
     [ReplaceDbContext(typeof(ITenantManagementDbContext))]
     [ConnectionStringName("Default")]
     public class TodoAppDbContext :
-        AbpDbContext<TodoAppDbContext>,
+        AbstractShardingAbpDbContext<TodoAppDbContext>,
         IIdentityDbContext,
-        ITenantManagementDbContext
+        ITenantManagementDbContext,
+        IShardingTableDbContext
     {
         /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
@@ -81,5 +84,7 @@ namespace TodoApp.EntityFrameworkCore
                 b.ToTable("TodoItems");
             });
         }
+
+        public IRouteTail RouteTail { get; set; }
     }
 }
