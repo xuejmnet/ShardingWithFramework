@@ -6,7 +6,19 @@ namespace TodoApp;
 public class UseShardingCoreComponent:IApplicationComponent
 {
     public void Load(IApplicationBuilder app, IWebHostEnvironment env, ComponentContext componentContext)
-    {
+    {if (env.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+
+        app.UseRouting();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
+
         app.ApplicationServices.UseAutoShardingCreate();
         var serviceProvider = app.ApplicationServices;
         using (var scope = app.ApplicationServices.CreateScope())

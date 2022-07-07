@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace TodoApp.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -12,13 +13,15 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly MyDbContext _myDbContext;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger,MyDbContext myDbContext)
     {
         _logger = logger;
+        _myDbContext = myDbContext;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
+    [HttpGet]
     public IEnumerable<WeatherForecast> Get()
     {
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -28,5 +31,24 @@ public class WeatherForecastController : ControllerBase
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> Add()
+    {
+        var todoItem = new TodoItem()
+        {
+            Id = Guid.NewGuid().ToString("n"),
+            Text = Guid.NewGuid().ToString("n")
+        };
+        await _myDbContext.AddAsync(todoItem);
+        await _myDbContext.SaveChangesAsync();
+        return Ok(todoItem);
+    }
+    [HttpGet]
+    public async Task<IActionResult> List()
+    {
+        var list = await _myDbContext.Set<TodoItem>().ToListAsync();
+        return Ok(list);
     }
 }

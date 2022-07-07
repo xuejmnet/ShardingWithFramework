@@ -9,7 +9,7 @@ public class CustomerDbContextCreator:ActivatorDbContextCreator<MyDbContext>
     public override DbContext GetShellDbContext(IShardingProvider shardingProvider)
     {
         var dbContextOptionsBuilder = new DbContextOptionsBuilder<MyDbContext>();
-        dbContextOptionsBuilder.UseDefaultSharding<MyDbContext>(ShardingCoreComponent.ShardingCoreContext);
+        dbContextOptionsBuilder.UseDefaultSharding<MyDbContext>(ShardingCoreProvider.ShardingRuntimeContext);
         return new MyDbContext(dbContextOptionsBuilder.Options);
     }
 }
