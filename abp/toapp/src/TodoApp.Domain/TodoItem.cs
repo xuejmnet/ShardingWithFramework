@@ -3,7 +3,8 @@ using Volo.Abp.Domain.Entities;
 
 namespace TodoApp
 {
-    public class TodoItem : BasicAggregateRoot<Guid>,IShardingKeyIsGuId,IShardingKeyIsCreationTime
+    //不做时间分片所以不需要提前赋值
+    public class TodoItem : BasicAggregateRoot<Guid>,IShardingKeyIsGuId//,IShardingKeyIsCreationTime
     {
         public string Text { get; set; }
     }
