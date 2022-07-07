@@ -86,12 +86,14 @@ namespace ShardingWTM
     /// DesignTimeFactory for EF Migration, use your full connection string,
     /// EF will find this class and use the connection defined here to run Add-Migration and Update-Database
     /// </summary>
-    // public class DataContextFactory : IDesignTimeDbContextFactory<DataContext>
-    // {
-    //     public DataContext CreateDbContext(string[] args)
-    //     {
-    //         return new DataContext("your full connection string", DBTypeEnum.SqlServer);
-    //     }
-    // }
+    public class DataContextFactory : IDesignTimeDbContextFactory<DataContext>
+    {
+        public DataContext CreateDbContext(string[] args)
+        {
+            var virtualDataSource = ShardingCoreProvider.ShardingRuntimeContext.GetVirtualDataSource();
+            var defaultConnectionString = virtualDataSource.DefaultConnectionString;
+            return new DataContext(defaultConnectionString, DBTypeEnum.MySql);
+        }
+    }
 
 }
