@@ -85,13 +85,12 @@ namespace ShardingWTM
             //定时任务
             app.ApplicationServices.UseAutoShardingCreate();
 
-            using (var scope=app.ApplicationServices.CreateScope())
+            using (var dbconContext=new DataContextFactory().CreateDbContext(new string[0]))
             {
-                var dbconContext = scope.ServiceProvider.GetRequiredService<DataContext>();
                 dbconContext.Database.Migrate();
             }
-            //补齐表防止iis之类的休眠导致按天按月的表没有新建
-            app.ApplicationServices.UseAutoTryCompensateTable();
+            // //补齐表防止iis之类的休眠导致按天按月的表没有新建
+            // app.ApplicationServices.UseAutoTryCompensateTable();
             app.UseExceptionHandler(configs.CurrentValue.ErrorHandler);
             app.UseStaticFiles();
             app.UseWtmStaticFiles();

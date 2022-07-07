@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using ShardingCore;
 using ShardingCore.Core.DbContextCreator;
 using ShardingCore.Core.RuntimeContexts;
+using ShardingCore.TableExists;
+using ShardingCore.TableExists.Abstractions;
 using TodoApp.Routes;
 
 namespace TodoApp;
@@ -44,6 +46,6 @@ public class ShardingCoreProvider
                 {
                     b.ReplaceService<IMigrationsSqlGenerator, ShardingMySqlMigrationsSqlGenerator>();
                 });
-            }).ReplaceService<IDbContextCreator, CustomerDbContextCreator>(ServiceLifetime.Singleton).Build();
+            }).ReplaceService<ITableEnsureManager,SqlServerTableEnsureManager>(ServiceLifetime.Singleton).ReplaceService<IDbContextCreator, CustomerDbContextCreator>(ServiceLifetime.Singleton).Build();
     }
 }
