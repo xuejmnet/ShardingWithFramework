@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShardingWTM", "ShardingWTM\ShardingWTM.csproj", "{8931866B-0AEC-4D94-8191-F29127D1973D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShardingWTM.Test", "ShardingWTM.Test\ShardingWTM.Test.csproj", "{A61F3868-39F2-408F-8F68-402453C31574}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8931866B-0AEC-4D94-8191-F29127D1973D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8931866B-0AEC-4D94-8191-F29127D1973D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8931866B-0AEC-4D94-8191-F29127D1973D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8931866B-0AEC-4D94-8191-F29127D1973D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A61F3868-39F2-408F-8F68-402453C31574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A61F3868-39F2-408F-8F68-402453C31574}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A61F3868-39F2-408F-8F68-402453C31574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A61F3868-39F2-408F-8F68-402453C31574}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F219808-E6E8-4C1D-B846-41F2F7CF20FA}
+	EndGlobalSection
+EndGlobal
