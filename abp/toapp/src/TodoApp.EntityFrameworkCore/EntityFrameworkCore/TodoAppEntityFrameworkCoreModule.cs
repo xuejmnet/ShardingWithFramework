@@ -61,7 +61,7 @@ namespace TodoApp.EntityFrameworkCore
                 options.UseSqlServer();
                 options.Configure<TodoAppDbContext>(innerContext =>
                 {
-                    ShardingCoreExtension.UseDefaultSharding<TodoAppDbContext>(innerContext.ServiceProvider, innerContext.DbContextOptions);
+                     innerContext.DbContextOptions.UseDefaultSharding<TodoAppDbContext>(innerContext.ServiceProvider);
                 });
             });
             context.Services.AddShardingConfigure<TodoAppDbContext>()
