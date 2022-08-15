@@ -14,8 +14,10 @@ using ShardingCore.Extensions;
 using ShardingCore.Sharding;
 using ShardingCore.Sharding.Abstractions;
 using ShardingCore.Sharding.ShardingDbContextExecutors;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.ObjectExtending;
 using Volo.Abp.Reflection;
 
 namespace TodoApp.EntityFrameworkCore
@@ -26,7 +28,7 @@ namespace TodoApp.EntityFrameworkCore
     /// Author: xjm
     /// Created: 2022/7/6 13:54:01
     /// Email: 326308290@qq.com
-    public abstract class AbstractShardingAbpDbContext<TDbContext> : AbpDbContext<TDbContext>, IShardingDbContext, ISupportShardingReadWrite
+    public abstract class AbstractShardingAbpDbContext<TDbContext> : AbpDbContext<TDbContext>, IShardingDbContext, ISupportShardingReadWrite,ICurrentDbContextDiscover
                                 where TDbContext : DbContext
     {
         private readonly IShardingDbContextExecutor _shardingDbContextExecutor;
@@ -74,6 +76,14 @@ namespace TodoApp.EntityFrameworkCore
             if (dbContext is AbpDbContext<TDbContext> abpDbContext && abpDbContext.LazyServiceProvider == null)
             {
                 abpDbContext.LazyServiceProvider = this.LazyServiceProvider;
+                if (dbContext is IAbpEfCoreDbContext abpEfCoreDbContext)
+                {
+                    abpEfCoreDbContext.Initialize(
+                        new AbpEfCoreDbContextInitializationContext(
+                            this.UnitOfWorkManager.Current
+                        )
+                    );
+                }
             }
 
             return dbContext;
@@ -92,6 +102,15 @@ namespace TodoApp.EntityFrameworkCore
             if (dbContext is AbpDbContext<TDbContext> abpDbContext && abpDbContext.LazyServiceProvider == null)
             {
                 abpDbContext.LazyServiceProvider = this.LazyServiceProvider;
+
+                if (dbContext is IAbpEfCoreDbContext abpEfCoreDbContext)
+                {
+                    abpEfCoreDbContext.Initialize(
+                        new AbpEfCoreDbContextInitializationContext(
+                            this.UnitOfWorkManager.Current
+                        )
+                    );
+                }
             }
 
             return dbContext;
@@ -573,6 +592,11 @@ namespace TodoApp.EntityFrameworkCore
         public void Commit()
         {
             _shardingDbContextExecutor.Commit();
+        }
+
+        public IDictionary<string, IDataSourceDbContext> GetCurrentDbContexts()
+        {
+           return _shardingDbContextExecutor.GetCurrentDbContexts();
         }
     }
 }

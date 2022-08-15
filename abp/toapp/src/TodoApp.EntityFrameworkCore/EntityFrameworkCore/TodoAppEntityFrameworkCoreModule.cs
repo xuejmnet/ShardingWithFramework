@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ShardingCore;
 using ShardingCore.EFCores;
+using ShardingCore.EFCores.ChangeTrackers;
 using TodoApp.Routes;
 using Volo.Abp;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -18,6 +20,7 @@ using Volo.Abp.IdentityServer.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 
 namespace TodoApp.EntityFrameworkCore
@@ -36,6 +39,10 @@ namespace TodoApp.EntityFrameworkCore
         )]
     public class TodoAppEntityFrameworkCoreModule : AbpModule
     {
+        static TodoAppEntityFrameworkCoreModule()
+        {
+            TodoAppEfCoreEntityExtensionMappings.Configure();
+        }
         public static readonly ILoggerFactory efLogger = LoggerFactory.Create(builder =>
         {
             builder.AddFilter((category, level) => category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information).AddConsole();
@@ -53,7 +60,6 @@ namespace TodoApp.EntityFrameworkCore
                  * default repositories only for aggregate roots */
                 options.AddDefaultRepositories(includeAllEntities: true);
             });
-
             Configure<AbpDbContextOptions>(options =>
             {
                 /* The main point to change your DBMS.
@@ -61,7 +67,9 @@ namespace TodoApp.EntityFrameworkCore
                 options.UseSqlServer();
                 options.Configure<TodoAppDbContext>(innerContext =>
                 {
-                     innerContext.DbContextOptions.UseDefaultSharding<TodoAppDbContext>(innerContext.ServiceProvider);
+                    //innerContext.DbContextOptions
+                    //    .ReplaceService<IChangeTrackerFactory, ShardingChangeTrackerFactory>();
+                    innerContext.DbContextOptions.UseDefaultSharding<TodoAppDbContext>(innerContext.ServiceProvider);
                 });
             });
             context.Services.AddShardingConfigure<TodoAppDbContext>()
