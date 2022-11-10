@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ShardingCore;
 using ShardingCore.EFCores;
-using ShardingCore.EFCores.ChangeTrackers;
 using TodoApp.Routes;
 using Volo.Abp;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -111,7 +110,7 @@ namespace TodoApp.EntityFrameworkCore
         {
             base.OnPostApplicationInitialization(context);
             //创建表的定时任务如果有按年月日系统默认路由的需要系统创建的记得开起来
-            context.ServiceProvider.UseAutoShardingCreate();
+            // context.ServiceProvider.UseAutoShardingCreate();已经移除只需要第一次调用dbcontext就会启动定时任务
             //补偿表 //自动迁移的话不需要
             //context.ServiceProvider.UseAutoTryCompensateTable();
         }

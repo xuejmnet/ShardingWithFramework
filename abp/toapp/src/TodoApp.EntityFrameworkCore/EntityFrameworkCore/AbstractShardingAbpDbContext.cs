@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ShardingCore.Core.VirtualDatabase.VirtualDataSources;
 using ShardingCore.Core.VirtualRoutes.TableRoutes.RouteTails.Abstractions;
-using ShardingCore.EFCores.OptionsExtensions;
+using ShardingCore.EFCores;
 using ShardingCore.Extensions;
 using ShardingCore.Sharding;
 using ShardingCore.Sharding.Abstractions;
@@ -28,7 +28,7 @@ namespace TodoApp.EntityFrameworkCore
     /// Author: xjm
     /// Created: 2022/7/6 13:54:01
     /// Email: 326308290@qq.com
-    public abstract class AbstractShardingAbpDbContext<TDbContext> : AbpDbContext<TDbContext>, IShardingDbContext, ISupportShardingReadWrite,ICurrentDbContextDiscover
+    public abstract class AbstractShardingAbpDbContext<TDbContext> : AbpDbContext<TDbContext>, IShardingDbContext
                                 where TDbContext : DbContext
     {
         private readonly IShardingDbContextExecutor _shardingDbContextExecutor;
@@ -116,10 +116,11 @@ namespace TodoApp.EntityFrameworkCore
             return dbContext;
         }
 
-        public IVirtualDataSource GetVirtualDataSource()
+        public IShardingDbContextExecutor GetShardingExecutor()
         {
-            return _shardingDbContextExecutor.GetVirtualDataSource();
+            return _shardingDbContextExecutor;
         }
+
 
         private void CheckAndSetShardingKeyThatSupportAutoCreate<TEntity>(TEntity entity) where TEntity : class
         {
@@ -568,35 +569,6 @@ namespace TodoApp.EntityFrameworkCore
 
                 await base.DisposeAsync();
             }
-        }
-        public Task RollbackAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return _shardingDbContextExecutor.RollbackAsync(cancellationToken);
-        }
-
-        public Task CommitAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return _shardingDbContextExecutor.CommitAsync(cancellationToken);
-        }
-
-        public void NotifyShardingTransaction()
-        {
-            _shardingDbContextExecutor.NotifyShardingTransaction();
-        }
-
-        public void Rollback()
-        {
-            _shardingDbContextExecutor.Rollback();
-        }
-
-        public void Commit()
-        {
-            _shardingDbContextExecutor.Commit();
-        }
-
-        public IDictionary<string, IDataSourceDbContext> GetCurrentDbContexts()
-        {
-           return _shardingDbContextExecutor.GetCurrentDbContexts();
         }
     }
 }
