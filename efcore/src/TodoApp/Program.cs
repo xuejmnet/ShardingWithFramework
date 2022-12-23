@@ -55,8 +55,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
- //如果有按时间分片的需要加定时任务否则可以不加
-app.Services.UseAutoShardingCreate();
  
  using (var scope = app.Services.CreateScope())
  {
