@@ -82,8 +82,6 @@ namespace ShardingWTM
             //     var requiredService = scope.ServiceProvider.GetRequiredService<WTMContext>();
             //     var requiredServiceDc = requiredService.DC;
             // }
-            //定时任务
-            app.ApplicationServices.UseAutoShardingCreate();
 
             using (var dbconContext=new DataContextFactory().CreateDbContext(new string[0]))
             {

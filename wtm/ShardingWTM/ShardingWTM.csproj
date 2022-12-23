@@ -16,7 +16,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ShardingCore" Version="6.6.0.5" />
+    <PackageReference Include="ShardingCore" Version="7.6.1.1-preview1" />
     <PackageReference Include="WalkingTec.Mvvm.TagHelpers.LayUI" Version="6.2.2" />
     <PackageReference Include="WalkingTec.Mvvm.Mvc" Version="6.2.2" />
 </ItemGroup>
