@@ -19,7 +19,6 @@ public class UseShardingCoreComponent:IApplicationComponent
             endpoints.MapControllers();
         });
 
-        app.ApplicationServices.UseAutoShardingCreate();
         var serviceProvider = app.ApplicationServices;
         using (var scope = app.ApplicationServices.CreateScope())
         {
