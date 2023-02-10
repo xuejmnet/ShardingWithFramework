@@ -13,7 +13,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
-      <PackageReference Include="ShardingCore" Version="7.6.1.1-preview1" />
+      <PackageReference Include="ShardingCore" Version="7.6.1.1" />
     </ItemGroup>
 
 </Project>

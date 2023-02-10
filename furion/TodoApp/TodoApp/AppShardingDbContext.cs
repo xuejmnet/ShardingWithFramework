@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ShardingCore.EFCores;
 using ShardingCore.Sharding.Abstractions;
 using ShardingCore.Sharding.ShardingDbContextExecutors;
+using ShardingCore.Extensions;
 
 namespace TodoApp;
 
@@ -19,15 +20,11 @@ public abstract class AppShardingDbContext<TDbContext, TDbContextLocator>
     where TDbContext : DbContext
     where TDbContextLocator : class, IDbContextLocator
 {
-    private readonly IShardingDbContextExecutor? _shardingDbContextExecutor;
+    private  IShardingDbContextExecutor? _shardingDbContextExecutor;
 
+    private bool _createExecutor = false;
     protected AppShardingDbContext(DbContextOptions<TDbContext> options) : base(options)
     {
-        var wrapOptionsExtension = options.FindExtension<ShardingWrapOptionsExtension>();
-        if (wrapOptionsExtension != null)
-        {
-            _shardingDbContextExecutor = new ShardingDbContextExecutor(this);
-        }
     }
 
     public override void Dispose()
@@ -48,6 +45,11 @@ public abstract class AppShardingDbContext<TDbContext, TDbContextLocator>
 
     public IShardingDbContextExecutor GetShardingExecutor()
     {
+        if (!_createExecutor)
+        {
+            _shardingDbContextExecutor=this.CreateShardingDbContextExecutor();
+            _createExecutor = true;
+        }
         return _shardingDbContextExecutor!;
     }
 }
