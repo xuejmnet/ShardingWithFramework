@@ -10,49 +10,38 @@ using ShardingCore.Core.VirtualRoutes.TableRoutes.RouteTails.Abstractions;
 using ShardingCore.EFCores;
 using ShardingCore.Sharding;
 using ShardingCore.Sharding.Abstractions;
-using ShardingCore.Sharding.ShardingDbContextExecutors;
 using WalkingTec.Mvvm.Core;
-using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 using DbContextOptions = Microsoft.EntityFrameworkCore.DbContextOptions;
+using ShardingCore.Extensions;
 
 namespace ShardingWTM
 {
 
     public abstract class AbstractShardingFrameworkContext:FrameworkContext, IShardingDbContext
     {
-        protected IShardingDbContextExecutor ShardingDbContextExecutor
-        {
-            get;
-        }
 
         public AbstractShardingFrameworkContext(CS cs)
             : base(cs)
         {
             
-            ShardingDbContextExecutor =new ShardingDbContextExecutor(this);
         }
         
         public AbstractShardingFrameworkContext(string cs, DBTypeEnum dbtype)
             : base(cs, dbtype)
         {
-            ShardingDbContextExecutor =new ShardingDbContextExecutor(this);
         }
         
         public AbstractShardingFrameworkContext(string cs, DBTypeEnum dbtype, string version = null)
             : base(cs, dbtype, version)
         {
-            ShardingDbContextExecutor =new ShardingDbContextExecutor(this);
         }
 
         public AbstractShardingFrameworkContext(DbContextOptions options) : base(options)
         {
-            var wrapOptionsExtension = options.FindExtension<ShardingWrapOptionsExtension>();
-            if (wrapOptionsExtension != null)
-            {
-                ShardingDbContextExecutor =new ShardingDbContextExecutor(this);;
-            }
 
         }
+        private bool _createExecutor = false;
+        private IShardingDbContextExecutor _shardingDbContextExecutor;
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -64,23 +53,29 @@ namespace ShardingWTM
         }
         public override void Dispose()
         {
-            ShardingDbContextExecutor?.Dispose();
+            _shardingDbContextExecutor?.Dispose();
             base.Dispose();
         }
 
         public override async ValueTask DisposeAsync()
         {
-            if (ShardingDbContextExecutor != null)
+            if (_shardingDbContextExecutor != null)
             {
-                await ShardingDbContextExecutor.DisposeAsync();
+                await _shardingDbContextExecutor.DisposeAsync();
             }
 
             await base.DisposeAsync();
         }
 
+
         public IShardingDbContextExecutor GetShardingExecutor()
         {
-            return ShardingDbContextExecutor;
+            if (!_createExecutor)
+            {
+                _shardingDbContextExecutor=this.CreateShardingDbContextExecutor();
+                _createExecutor = true;
+            }
+            return _shardingDbContextExecutor;
         }
     }
 }
