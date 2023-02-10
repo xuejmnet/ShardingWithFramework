@@ -26,6 +26,7 @@ namespace TodoApp
         
         public async Task<List<TodoItemDto>> GetListAsync()
         {
+            
             var list =await _dbContext.TodoItems.ToListAsync();
             var changeTrackerFactory = _dbContext.GetService<IChangeTrackerFactory>();
             var changeTracker = changeTrackerFactory.Create();

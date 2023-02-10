@@ -31,19 +31,34 @@ namespace TodoApp.EntityFrameworkCore
     public abstract class AbstractShardingAbpDbContext<TDbContext> : AbpDbContext<TDbContext>, IShardingDbContext
                                 where TDbContext : DbContext
     {
-        private readonly IShardingDbContextExecutor _shardingDbContextExecutor;
+        private bool _createExecutor = false;
         protected AbstractShardingAbpDbContext(DbContextOptions<TDbContext> options) : base(options)
         {
+        }
 
-            var wrapOptionsExtension = options.FindExtension<ShardingWrapOptionsExtension>();
-            if (wrapOptionsExtension != null)
+
+        private IShardingDbContextExecutor _shardingDbContextExecutor;
+        public IShardingDbContextExecutor GetShardingExecutor()
+        {
+            if (!_createExecutor)
             {
-                _shardingDbContextExecutor = new ShardingDbContextExecutor(this);
-                _shardingDbContextExecutor.EntityCreateDbContextBefore += (sender, args) =>
+                _shardingDbContextExecutor=this.DoCreateShardingDbContextExecutor();
+                _createExecutor = true;
+            }
+            return _shardingDbContextExecutor;
+        }
+
+        private IShardingDbContextExecutor DoCreateShardingDbContextExecutor()
+        {
+            var shardingDbContextExecutor = this.CreateShardingDbContextExecutor();
+            if (shardingDbContextExecutor != null)
+            {
+                
+                shardingDbContextExecutor.EntityCreateDbContextBefore += (sender, args) =>
                 {
                     CheckAndSetShardingKeyThatSupportAutoCreate(args.Entity);
                 };
-                _shardingDbContextExecutor.CreateDbContextAfter += (sender, args) =>
+                shardingDbContextExecutor.CreateDbContextAfter += (sender, args) =>
                 {
                     var dbContext = args.DbContext;
                     if (dbContext is AbpDbContext<TDbContext> abpDbContext && abpDbContext.LazyServiceProvider == null)
@@ -60,11 +75,7 @@ namespace TodoApp.EntityFrameworkCore
                     }
                 };
             }
-        }
-
-        public IShardingDbContextExecutor GetShardingExecutor()
-        {
-            return _shardingDbContextExecutor;
+            return shardingDbContextExecutor;
         }
 
 
@@ -116,7 +127,6 @@ namespace TodoApp.EntityFrameworkCore
             {
                 await _shardingDbContextExecutor.DisposeAsync();
             }
-
             await base.DisposeAsync();
         }
     }
