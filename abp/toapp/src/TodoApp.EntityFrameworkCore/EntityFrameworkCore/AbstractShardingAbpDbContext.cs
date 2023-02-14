@@ -64,7 +64,7 @@ namespace TodoApp.EntityFrameworkCore
                     if (dbContext is AbpDbContext<TDbContext> abpDbContext && abpDbContext.LazyServiceProvider == null)
                     {
                         abpDbContext.LazyServiceProvider = this.LazyServiceProvider;
-                        if (dbContext is IAbpEfCoreDbContext abpEfCoreDbContext)
+                        if (dbContext is IAbpEfCoreDbContext abpEfCoreDbContext&&this.UnitOfWorkManager.Current!=null)
                         {
                             abpEfCoreDbContext.Initialize(
                                 new AbpEfCoreDbContextInitializationContext(
