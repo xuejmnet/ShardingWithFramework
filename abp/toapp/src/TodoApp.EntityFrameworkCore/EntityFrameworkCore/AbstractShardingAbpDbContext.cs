@@ -114,6 +114,17 @@ namespace TodoApp.EntityFrameworkCore
                 AuditPropertySetter?.SetCreationProperties(entity);
             }
         }
+        /// <summary>
+        /// abp 5.x+ 如果存在并发字段那么需要添加这段代码
+        /// </summary>
+        protected override void HandlePropertiesBeforeSave()
+        {
+            if (GetShardingExecutor() == null)
+            {
+                base.HandlePropertiesBeforeSave();
+            }
+        }
+
 
         public override void Dispose()
         {
