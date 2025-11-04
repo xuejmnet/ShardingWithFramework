@@ -40,13 +40,13 @@ namespace TodoApp.EntityFrameworkCore
                     {
                         builder.ReplaceService<IMigrationsSqlGenerator, ShardingSqlServerMigrationsSqlGenerator>();
                     });
-                    op.AddDefaultDataSource("ds0", "Server=.;Database=TodoApp;Trusted_Connection=True");
+                    op.AddDefaultDataSource("ds0", "Server=localhost,1434;Database=TodoApp;User Id=sa;password=myPassw0rd;TrustServerCertificate=True");
                     op.AddExtraDataSource(sp =>
                     {
                         return new Dictionary<string, string>()
                         {
-                            { "ds1", "Server=.;Database=TodoApp1;Trusted_Connection=True" },
-                            { "ds2", "Server=.;Database=TodoApp2;Trusted_Connection=True" }
+                            { "ds1", "Server=localhost,1434;Database=TodoApp1;User Id=sa;password=myPassw0rd;TrustServerCertificate=True" },
+                            { "ds2", "Server=localhost,1434;Database=TodoApp2;User Id=sa;password=myPassw0rd;TrustServerCertificate=True" }
                         };
                     });
                 })
