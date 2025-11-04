@@ -16,6 +16,7 @@ using ShardingCore.Sharding.Abstractions;
 using ShardingCore.Sharding.ShardingDbContextExecutors;
 using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Events;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.Reflection;
@@ -29,22 +30,25 @@ namespace TodoApp.EntityFrameworkCore
     /// Created: 2022/7/6 13:54:01
     /// Email: 326308290@qq.com
     public abstract class AbstractShardingAbpDbContext<TDbContext> : AbpDbContext<TDbContext>, IShardingDbContext
-                                where TDbContext : DbContext
+        where TDbContext : DbContext
     {
         private bool _createExecutor = false;
+
         protected AbstractShardingAbpDbContext(DbContextOptions<TDbContext> options) : base(options)
         {
         }
 
 
         private IShardingDbContextExecutor _shardingDbContextExecutor;
+
         public IShardingDbContextExecutor GetShardingExecutor()
         {
             if (!_createExecutor)
             {
-                _shardingDbContextExecutor=this.DoCreateShardingDbContextExecutor();
+                _shardingDbContextExecutor = this.DoCreateShardingDbContextExecutor();
                 _createExecutor = true;
             }
+
             return _shardingDbContextExecutor;
         }
 
@@ -53,7 +57,6 @@ namespace TodoApp.EntityFrameworkCore
             var shardingDbContextExecutor = this.CreateShardingDbContextExecutor();
             if (shardingDbContextExecutor != null)
             {
-                
                 shardingDbContextExecutor.EntityCreateDbContextBefore += (sender, args) =>
                 {
                     CheckAndSetShardingKeyThatSupportAutoCreate(args.Entity);
@@ -64,7 +67,8 @@ namespace TodoApp.EntityFrameworkCore
                     if (dbContext is AbpDbContext<TDbContext> abpDbContext && abpDbContext.LazyServiceProvider == null)
                     {
                         abpDbContext.LazyServiceProvider = this.LazyServiceProvider;
-                        if (dbContext is IAbpEfCoreDbContext abpEfCoreDbContext&&this.UnitOfWorkManager.Current!=null)
+                        if (dbContext is IAbpEfCoreDbContext abpEfCoreDbContext &&
+                            this.UnitOfWorkManager.Current != null)
                         {
                             abpEfCoreDbContext.Initialize(
                                 new AbpEfCoreDbContextInitializationContext(
@@ -75,6 +79,7 @@ namespace TodoApp.EntityFrameworkCore
                     }
                 };
             }
+
             return shardingDbContextExecutor;
         }
 
@@ -83,13 +88,13 @@ namespace TodoApp.EntityFrameworkCore
         {
             if (entity is IShardingKeyIsGuId)
             {
-
                 if (entity is IEntity<Guid> guidEntity)
                 {
                     if (guidEntity.Id != default)
                     {
                         return;
                     }
+
                     var idProperty = entity.GetObjectProperty(nameof(IEntity<Guid>.Id));
 
                     var dbGeneratedAttr = ReflectionHelper
@@ -97,7 +102,8 @@ namespace TodoApp.EntityFrameworkCore
                             idProperty
                         );
 
-                    if (dbGeneratedAttr != null && dbGeneratedAttr.DatabaseGeneratedOption != DatabaseGeneratedOption.None)
+                    if (dbGeneratedAttr != null &&
+                        dbGeneratedAttr.DatabaseGeneratedOption != DatabaseGeneratedOption.None)
                     {
                         return;
                     }
@@ -114,6 +120,7 @@ namespace TodoApp.EntityFrameworkCore
                 AuditPropertySetter?.SetCreationProperties(entity);
             }
         }
+
         /// <summary>
         /// abp 5.x+ 如果存在并发字段那么需要添加这段代码
         /// </summary>
@@ -125,7 +132,28 @@ namespace TodoApp.EntityFrameworkCore
             }
         }
 
+        protected override EntityEventReport CreateEventReport()
+        {
+            if (GetShardingExecutor() == null)
+            {
+                return base.CreateEventReport();
+            }
 
+            return new EntityEventReport();
+        }
+
+        /// <summary>
+        /// abp 4.x+ 如果存在并发字段那么需要添加这段代码
+        /// </summary>
+        /// <returns></returns>
+
+        // protected override void ApplyAbpConcepts(EntityEntry entry, EntityChangeReport changeReport)
+        // {
+        //     if (GetShardingExecutor() == null)
+        //     {
+        //         base.ApplyAbpConcepts(entry, changeReport);
+        //     }
+        // }
         public override void Dispose()
         {
             _shardingDbContextExecutor?.Dispose();
@@ -138,6 +166,7 @@ namespace TodoApp.EntityFrameworkCore
             {
                 await _shardingDbContextExecutor.DisposeAsync();
             }
+
             await base.DisposeAsync();
         }
     }
