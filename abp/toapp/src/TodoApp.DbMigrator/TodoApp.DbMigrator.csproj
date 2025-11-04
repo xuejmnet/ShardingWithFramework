@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,11 +23,11 @@
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Autofac" Version="5.3.0" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="9.3.6" />
     <ProjectReference Include="..\TodoApp.Application.Contracts\TodoApp.Application.Contracts.csproj" />
     <ProjectReference Include="..\TodoApp.EntityFrameworkCore\TodoApp.EntityFrameworkCore.csproj" />
   </ItemGroup>
