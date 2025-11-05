@@ -26,6 +26,7 @@ using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Auditing;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.EventBus.RabbitMq;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Localization;
@@ -44,7 +45,7 @@ namespace TodoApp.Web
         typeof(TodoAppHttpApiModule),
         typeof(TodoAppApplicationModule),
         typeof(TodoAppEntityFrameworkCoreModule),
-        
+        typeof(AbpEventBusRabbitMqModule),
         typeof(AbpAutofacModule),
         typeof(AbpIdentityWebModule),
         typeof(AbpAccountWebIdentityServerModule),

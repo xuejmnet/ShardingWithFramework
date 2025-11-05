@@ -132,6 +132,10 @@ namespace TodoApp.EntityFrameworkCore
             }
         }
 
+        /// <summary>
+        /// 创建领域事件报告
+        /// </summary>
+        /// <returns></returns>
         protected override EntityEventReport CreateEventReport()
         {
             if (GetShardingExecutor() == null)
@@ -140,6 +144,57 @@ namespace TodoApp.EntityFrameworkCore
             }
 
             return new EntityEventReport();
+        }
+
+        /// <summary>
+        /// 发布实体事件
+        /// </summary>
+        /// <param name="changeReport"></param>
+        protected override void PublishEntityEvents(EntityEventReport changeReport)
+        {
+            if (GetShardingExecutor() == null)
+            {
+                base.PublishEntityEvents(changeReport);
+            }
+        }
+
+        /// <summary>
+        /// 发布变更实体的事件
+        /// </summary>
+        /// <returns></returns>
+        protected override Task PublishEventsForChangedEntityOnSaveChangeAsync()
+        {
+            if (GetShardingExecutor() == null)
+            {
+                return base.PublishEventsForChangedEntityOnSaveChangeAsync();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+            var list = AuditingManager?.Current?.Log.EntityChanges.GroupBy(p => new
+            {
+                p.EntityTypeFullName,
+                p.EntityId,
+                p.ChangeType
+            }).Select(p => p.First()).ToList();
+            // 判断是否存在重复的变更项
+            if (list == null || list.Count == 0 || list.Count == AuditingManager.Current.Log.EntityChanges.Count)
+            {
+                return result;
+            }
+
+            AuditingManager.Current.Log.EntityChanges.Clear();
+            foreach (var item in list)
+            {
+                AuditingManager.Current.Log.EntityChanges.Add(item);
+            }
+
+            return result;
         }
 
         /// <summary>
