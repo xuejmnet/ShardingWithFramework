@@ -3,7 +3,7 @@
   <Import Project="..\..\common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <RootNamespace>TodoApp</RootNamespace>
@@ -18,7 +18,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.26" />
     <ProjectReference Include="..\TodoApp.Application.Tests\TodoApp.Application.Tests.csproj" />
     <ProjectReference Include="..\..\src\TodoApp.Web\TodoApp.Web.csproj" />
-    <PackageReference Include="Volo.Abp.AspNetCore.TestBase" Version="5.3.0" />
+    <PackageReference Include="Volo.Abp.AspNetCore.TestBase" Version="9.3.6" />
   </ItemGroup>
 
   <ItemGroup>

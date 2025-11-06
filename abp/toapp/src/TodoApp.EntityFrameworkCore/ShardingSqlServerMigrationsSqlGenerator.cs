@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.EntityFrameworkCore.Update;
 using ShardingCore.Core.RuntimeContexts;
 using ShardingCore.Helpers;
 
@@ -22,7 +23,12 @@ namespace TodoApp
     {
         private readonly IShardingRuntimeContext _shardingRuntimeContext;
 
-        public ShardingSqlServerMigrationsSqlGenerator(IShardingRuntimeContext shardingRuntimeContext,[NotNull] MigrationsSqlGeneratorDependencies dependencies, [NotNull] IRelationalAnnotationProvider migrationsAnnotations) : base(dependencies, migrationsAnnotations)
+        // public ShardingSqlServerMigrationsSqlGenerator(IShardingRuntimeContext shardingRuntimeContext,[NotNull] MigrationsSqlGeneratorDependencies dependencies, [NotNull] IRelationalAnnotationProvider migrationsAnnotations) : base(dependencies, migrationsAnnotations)
+        // {
+        //     _shardingRuntimeContext = shardingRuntimeContext;
+        // }
+
+        public ShardingSqlServerMigrationsSqlGenerator([NotNull] MigrationsSqlGeneratorDependencies dependencies, [NotNull] ICommandBatchPreparer commandBatchPreparer, IShardingRuntimeContext shardingRuntimeContext) : base(dependencies, commandBatchPreparer)
         {
             _shardingRuntimeContext = shardingRuntimeContext;
         }

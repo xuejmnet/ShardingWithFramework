@@ -2,7 +2,9 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TodoApp.MultiTenancy;
 using Volo.Abp.AuditLogging;
+using Volo.Abp.AutoMapper;
 using Volo.Abp.BackgroundJobs;
+using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Emailing;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -33,14 +35,22 @@ namespace TodoApp
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            Configure<AbpMultiTenancyOptions>(options =>
-            {
-                options.IsEnabled = MultiTenancyConsts.IsEnabled;
-            });
+            Configure<AbpMultiTenancyOptions>(options => { options.IsEnabled = MultiTenancyConsts.IsEnabled; });
 
 #if DEBUG
             context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
 #endif
+            
+            Configure<AbpAutoMapperOptions>(options =>
+            {
+                options.AddMaps<TodoAppDomainModule>();
+            });
+
+            Configure<AbpDistributedEntityEventOptions>(options =>
+            {
+                options.AutoEventSelectors.Add<TodoItem>();
+                options.EtoMappings.Add<TodoItem, TodoItemEntityEto>();
+            });
         }
     }
 }

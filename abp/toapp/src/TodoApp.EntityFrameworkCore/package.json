@@ -1,0 +1,22 @@
+{
+  "name": "todoapp.entityframeworkcore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+
+    "migrations:add": "dotnet ef migrations add 升级ABP框架至9点3点6 --verbose",
+    "migrations:remove": "dotnet ef migrations remove --verbose",
+
+    "migrations:script": "dotnet ef migrations script 20250625065325_修改后台作业表字段长度 --output ./Migrations/MigrationsScript.sql --verbose --idempotent",
+    "migrations:script:rollback": "dotnet ef migrations script 20251016042101_生成积分签到和FAQ和省市区排序配置表1 20250926022851_积分规则配置表连续签到规则改成可空text类型 --output ./Migrations/MigrationsScript-Rollback.sql --verbose --idempotent",
+
+    "database:update": "dotnet ef  database update --verbose --prefix-output",
+    "database:update:rollback": "dotnet ef database update 20251023023428_分销员管理与申请管理证件号改非必填 --verbose --prefix-output"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LEIRONGHUA/ShardingWithFramework.git"
+  },
+  "private": true
+}
