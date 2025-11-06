@@ -23,11 +23,10 @@ namespace TodoApp
             _todoItemRepository = todoItemRepository;
             _dbContext = dbContext;
         }
-        
+
         public async Task<List<TodoItemDto>> GetListAsync()
         {
-            
-            var list =await _dbContext.TodoItems.ToListAsync();
+            var list = await _dbContext.TodoItems.ToListAsync();
             var changeTrackerFactory = _dbContext.GetService<IChangeTrackerFactory>();
             var changeTracker = changeTrackerFactory.Create();
             var type = _dbContext.ChangeTracker.GetType();
@@ -49,6 +48,7 @@ namespace TodoApp
             var item = new TodoItem { Text = text };
             item.SetProperty("MyProperty", text);
             item.SetProperty("MyProperty1", text);
+            item.AddEvent();
             var todoItem = await _todoItemRepository.InsertAsync(
                 item
             );
