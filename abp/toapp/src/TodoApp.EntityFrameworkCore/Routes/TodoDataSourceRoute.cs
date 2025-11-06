@@ -17,13 +17,13 @@ namespace TodoApp.Routes
     /// Author: xjm
     /// Created: 2022/7/6 14:39:07
     /// Email: 326308290@qq.com
-    public class TodoDataSourceRoute:AbstractShardingOperatorVirtualDataSourceRoute<TodoItem,string>
+    public class TodoDataSourceRoute : AbstractShardingOperatorVirtualDataSourceRoute<TodoItem, Guid>
     {
         public override string ShardingKeyToDataSourceName(object shardingKey)
         {
             if (shardingKey == null) throw new InvalidOperationException("sharding key cant null");
             var stringHashCode = ShardingCoreHelper.GetStringHashCode(shardingKey.ToString());
-            return $"ds{(Math.Abs(stringHashCode) % 3)}";//ds0,ds1,ds2
+            return $"ds{(Math.Abs(stringHashCode) % 3)}"; //ds0,ds1,ds2
         }
 
         public override List<string> GetAllDataSourceNames()
@@ -44,7 +44,7 @@ namespace TodoApp.Routes
             builder.ShardingProperty(o => o.Id);
         }
 
-        public override Func<string, bool> GetRouteToFilter(string shardingKey, ShardingOperatorEnum shardingOperator)
+        public override Func<string, bool> GetRouteToFilter(Guid shardingKey, ShardingOperatorEnum shardingOperator)
         {
             var t = ShardingKeyToDataSourceName(shardingKey);
             switch (shardingOperator)
