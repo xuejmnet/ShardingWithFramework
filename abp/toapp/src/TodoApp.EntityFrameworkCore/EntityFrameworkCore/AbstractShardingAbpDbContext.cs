@@ -176,12 +176,13 @@ namespace TodoApp.EntityFrameworkCore
             CancellationToken cancellationToken = default)
         {
             var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            var list = AuditingManager?.Current?.Log.EntityChanges.GroupBy(p => new
+
+            var list = AuditingManager?.Current?.Log.EntityChanges.DistinctBy(p => new
             {
                 p.EntityTypeFullName,
                 p.EntityId,
                 p.ChangeType
-            }).Select(p => p.First()).ToList();
+            }).ToList();
             // 判断是否存在重复的变更项
             if (list == null || list.Count == 0 || list.Count == AuditingManager.Current.Log.EntityChanges.Count)
             {
